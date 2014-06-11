@@ -78,20 +78,21 @@ def decrypt(key, cipher_text):
     cipher_text_bytes = cipher_text.encode('utf-8')
     raw_decrypted = secret.decrypt(base64.b64decode(cipher_text_bytes))
     clear_val = raw_decrypted.rstrip(b"\0")
-    try:
-        return clear_val.decode('utf-8')
-    except UnicodeDecodeError:
-        # Invalid password
-        return ''
+    return clear_val.decode('utf-8')
 
 
 def transcrypt(view, enc, password, data):
     if enc:
         result = encrypt(password, data)
     else:
-        result = decrypt(password, data)
-        if data and not result:
-            panel(view.window(), 'Error: Wrong password?')
+        try:
+            result = decrypt(password, data)
+        except UnicodeError:
+            panel(view.window(),
+                  "Error: Output is not valid Unicode, wrong password?")
+        except ValueError:
+            panel(view.window(),
+                  "Error: Input is not valid output of AES encryption, sure it's been encrypted?")
     return result
 
 
