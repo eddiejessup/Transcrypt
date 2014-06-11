@@ -1,0 +1,6 @@
+/dist/
+/build/
+*.py[co]
+.DS_Store
+__pycache__/
+*.so

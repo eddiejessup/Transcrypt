@@ -1,0 +1,8 @@
+[{
+  "id": "transcryptcontext",
+  "caption": "Transcrypt",
+  "children":[
+    { "id":"transcrypt_encrypt", "caption": "Encrypt", "command": "aes_crypt", "args": {"enc": true} },
+    { "id":"transcrypt_decrypt", "caption": "Decrypt", "command": "aes_crypt", "args": {"enc": false} }
+  ]
+}]
