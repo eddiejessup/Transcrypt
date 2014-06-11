@@ -1,5 +1,5 @@
 Transcrypt Sublime Text 3 Package
-=============================
+=================================
 Encrypt and decrypt a document or selection(s) using PyCrypto using AES.
 
 Install
@@ -35,14 +35,18 @@ Requirements
 ------------
 Due to containing C extension modules pre-compiled for Python 3.3, only Sublime Text 3 is supported.
 
+Conflicts
+------
+Because this is essentially a fork of [Crypto](https://github.com/mediaupstream/SublimeText-Crypto), it uses the same default key bindings. They should otherwise happily coexist, so if you want to use both for some reason, change the key bindings of one.
+
 About
-----
+-----
 Based on [Crypto](https://github.com/mediaupstream/SublimeText-Crypto) by [Derek Anderson](https://github.com/mediaupstream) and [Richard Mitchell's fork](https://github.com/mitchellrj/pycrypto) of [PyCrypto](https://github.com/dlitz/pycrypto).
 
 Identical interface to Crypto, but supporting much larger text selections by avoiding the subprocess interface.
 
 Author & Contributors
-----------------------
+---------------------
 - [Elliot Marsden](https://github.com/eddiejessup)
 - [Derek Anderson](http://twitter.com/derekanderson)
 - [Isaac Muse](https://github.com/facelessuser)
