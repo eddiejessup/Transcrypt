@@ -26,6 +26,14 @@ class WrongPasswordException(Exception):
     pass
 
 
+class TranscryptEventListener(sublime_plugin.EventListener):
+    def on_pre_save(self, view):
+        if view.settings().get('TRANSCRYPT_ONSAVE'):
+            view().run_command("transcrypt_password", {"enc": True})
+        print('hey boy')
+        super().on_pre_save(view)
+
+
 class TranscryptPasswordCommand(sublime_plugin.WindowCommand):
 
     def run(self, enc):
