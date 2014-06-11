@@ -26,7 +26,7 @@ class WrongPasswordException(Exception):
     pass
 
 
-class AesCryptCommand(sublime_plugin.WindowCommand):
+class TranscryptPasswordCommand(sublime_plugin.WindowCommand):
 
     def run(self, enc):
         self.enc = enc

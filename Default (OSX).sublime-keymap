@@ -1,4 +1,4 @@
 [
-  {"keys": ["super+k", "e"], "command": "aes_crypt", "args": {"enc": true}},
-  {"keys": ["super+k", "d"], "command": "aes_crypt", "args": {"enc": false}}
+  {"keys": ["super+k", "e"], "command": "transcrypt_password", "args": {"enc": true}},
+  {"keys": ["super+k", "d"], "command": "transcrypt_password", "args": {"enc": false}}
 ]

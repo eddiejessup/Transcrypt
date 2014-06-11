@@ -7,11 +7,11 @@
     "caption": "Transcrypt",
     "children": [{
         "caption": "Transcrypt::Encrypt",
-        "command": "aes_crypt", "args": {"enc": true}
+        "command": "transcrypt_password", "args": {"enc": true}
       },
       {
         "caption": "Transcrypt::Decrypt",
-        "command": "aes_crypt", "args": {"enc": false}
+        "command": "transcrypt_password", "args": {"enc": false}
       }]
     }]
 },{

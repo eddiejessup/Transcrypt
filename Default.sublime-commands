@@ -1,10 +1,10 @@
 [{
   "caption": "Transcrypt::Encrypt",
-  "command": "aes_crypt", 
+  "command": "transcrypt_password",
   "args": { "enc": true }
 },
 {
   "caption": "Transcrypt::Decrypt",
-  "command": "aes_crypt", 
+  "command": "transcrypt_password",
   "args": {"enc": false }
 }]
