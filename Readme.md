@@ -1,45 +1,53 @@
 Transcrypt Sublime Text 3 Package
 =============================
-
-### Encrypt/ Decrypt a document or selection(s) using PyCrypto
-
+Encrypt and decrypt a document or selection(s) using PyCrypto using AES.
 
 Install
 -------
-Installation via the [Package Control](http://wbond.net/sublime_packages/package_control) (Search for `Transcrypt`)
-  
-To install manually clone this project into your `Sublime Text 3/Packages` folder:
+### Package Control
+- See [here](http://wbond.net/sublime_packages/package_control) for instructions on installation of Package Control
+- In Sublime Text, search for package 'Transcrypt'
 
-*OSX*
+### Manual
+Clone this repository into `Sublime Text 3/Packages` using OS-appropriate location:
 
-    git clone git://github.com/mediaupstream/SublimeText-Transcrypt.git ~/Library/Application\ Support/Sublime\ Text\ 2/Packages/Transcrypt
+OSX:
 
+    git clone git://github.com/eddiejessup/SublimeText-Transcrypt.git ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/Transcrypt
+
+Windows:
+
+    git clone git://github.com/eddiejessup/SublimeText-Transcrypt.git "%APPDATA%\Sublime Text 3\Packages\Transcrypt"
 
 Usage
 -----
-After installation you will have:  
+Access `Encrypt` and `Decrypt` via:
 
-* Right-click menu item `Transcrypt` and `Tools > Transcrypt` with two options:  
-  - `Encrypt`
-  - `Decrypt`
-* Default keyboard shortcuts:  
-  - `⌘+K,e` on OSX or `ctrl+K,e` on Linux/Windows (Encrypt)
-  - `⌘+K,d` on OSX or `ctrl+K,d` on Linux/Windows (Decrypt)
+- Right-click menu item `Transcrypt`
+- Menu item `Tools -> Transcrypt`
+- Default keyboard shortcuts:
+  - Encrypt: `⌘+K, e` (OSX) or `ctrl+K, e` (Linux and Windows)
+  - Decrypt: `⌘+K, d` (OSX) or `ctrl+K, d` (Linux and Windows)
 
-The commands work on a selection, multiple selections or if nothing is selected the whole document. Once you trigger the command you will be prompted to enter a password.
+The commands work on a selection, multiple selections or if nothing is selected, the whole document. Once you trigger the command you will be prompted to enter a password.
 
+Requirements
+------------
+Due to containing C extension modules pre-compiled for Python 3.3, only Sublime Text 3 is supported.
 
-Todo
+About
 ----
-* Add other functionality:
-  - encryption on save
+Based on [Crypto](https://github.com/mediaupstream/SublimeText-Crypto) by [Derek Anderson](https://github.com/mediaupstream) and [Richard Mitchell's fork](https://github.com/mitchellrj/pycrypto) of [PyCrypto](https://github.com/dlitz/pycrypto).
+
+Identical interface to Crypto, but supporting much larger text selections by avoiding the subprocess interface.
 
 Author & Contributors
 ----------------------
-[Derek Anderson](http://twitter.com/derekanderson)  
-[Isaac Muse](https://github.com/facelessuser)  
-[Elliot Marsden](https://github.com/eddiejessup)  
-
+- [Elliot Marsden](https://github.com/eddiejessup)
+- [Derek Anderson](http://twitter.com/derekanderson)
+- [Isaac Muse](https://github.com/facelessuser)
+- [Richard Mitchell](https://github.com/mitchellrj)
+- [Dwayne Litzenberger](https://github.com/dlitz)
 
 License
 -------
