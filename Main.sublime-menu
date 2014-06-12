@@ -8,11 +8,13 @@
     "children": [
       {
         "caption": "Encrypt",
-        "command": "transcrypt_password", "args": {"enc": true}
+        "command": "transcrypt_password",
+        "args": {"enc": true}
       },
       {
         "caption": "Decrypt",
-        "command": "transcrypt_password", "args": {"enc": false}
+        "command": "transcrypt_password",
+        "args": {"enc": false}
       },
       {
         "caption": "Enable encrypt on save",
@@ -23,7 +25,7 @@
         "command": "transcrypt_toggle_on_save", "args": {"on_save": false}
       }
     ]
-    }]
+  }]
 },{
   "caption": "Preferences",
   "mnemonic": "n",
