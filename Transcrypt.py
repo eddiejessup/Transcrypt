@@ -18,13 +18,20 @@ import bisect
 from Transcrypt.Crypto import AES
 
 
-class AesCryptCommand(sublime_plugin.WindowCommand):
+class BadPaddingException(Exception):
+    pass
+
+
+class WrongPasswordException(Exception):
+    pass
+
+
+class TranscryptPasswordCommand(sublime_plugin.WindowCommand):
 
     def run(self, enc):
         self.enc = enc
         message = "Create a Password:" if enc else "Enter Password:"
         self.window.show_input_panel(message, "", self.on_done, None, None)
-        pass
 
     def on_done(self, password):
         try:
@@ -35,12 +42,6 @@ class AesCryptCommand(sublime_plugin.WindowCommand):
             pass
 
 
-class TranscryptMessageCommand(sublime_plugin.TextCommand):
-
-    def run(self, edit, message):
-        self.view.insert(edit, self.view.size(), message)
-
-
 def panel(window, message):
     p = window.get_output_panel('transcrypt_error')
     p.run_command("transcrypt_message", {"message": message})
@@ -49,6 +50,10 @@ def panel(window, message):
 
 
 def key_round(key_b):
+    '''
+    Pad or truncate key_b (assumed to be bytes) as needed to be compatible
+    with AES encryption: of length 16, 24 or 32.
+    '''
     key_len = len(key_b)
     key_sizes = [16, 24, 32]
     # Pad
@@ -60,59 +65,65 @@ def key_round(key_b):
         return key_b[:max(key_sizes)]
 
 
-def encrypt(key, clear_text):
-    key_b = key.encode('utf-8')
+def crypt(key_text, input_text, enc):
+    '''
+    Encrypt ('enc' == True) or decrypt ('enc' == False) unicode string
+    'input_text' using AES algorithm using unicode string 'key_text'
+    as the encryption key (padded or truncated as needed).
+    '''
+    key_b = key_text.encode('utf-8')
     key_b_round = key_round(key_b)
     secret = AES.new(key_b_round)
-    clear_text_b = clear_text.encode('utf-8')
-    undershoot = len(clear_text_b) % AES.block_size
-    tag_string = clear_text_b + (AES.block_size - undershoot) * b'\0'
-    cipher_text = base64.b64encode(secret.encrypt(tag_string))
-    return cipher_text.decode('utf-8')
+    input_b = input_text.encode('utf-8')
 
-
-def decrypt(key, cipher_text):
-    key_b = key.encode('utf-8')
-    key_b_round = key_round(key_b)
-    secret = AES.new(key_b_round)
-    cipher_text_bytes = cipher_text.encode('utf-8')
-    raw_decrypted = secret.decrypt(base64.b64decode(cipher_text_bytes))
-    clear_val = raw_decrypted.rstrip(b"\0")
-    return clear_val.decode('utf-8')
-
-
-def transcrypt(view, enc, password, data):
     if enc:
-        result = encrypt(password, data)
+        undershoot = len(input_b) % AES.block_size
+        input_b_pad = input_b + (AES.block_size - undershoot) * b'\0'
+        output_b = base64.b64encode(secret.encrypt(input_b_pad))
+        output_text = output_b.decode('utf-8')
     else:
         try:
-            result = decrypt(password, data)
-        except UnicodeError:
-            panel(view.window(),
-                  "Error: Output is not valid Unicode, wrong password?")
+            output_b_pad = secret.decrypt(base64.b64decode(input_b))
         except ValueError:
-            panel(view.window(),
-                  "Error: Input is not valid output of AES encryption, sure it's been encrypted?")
-    return result
+            raise BadPaddingException
+        output_b = output_b_pad.rstrip(b"\0")
+        try:
+            output_text = output_b.decode('utf-8')
+        except UnicodeError:
+            raise WrongPasswordException
+
+    return output_text
 
 
 class TranscryptCommand(sublime_plugin.TextCommand):
 
     def run(self, edit, enc, password):
-        # save the document size
+        # Save the document size
         view_size = self.view.size()
-        # get selections
+        # Get selections
         regions = self.view.sel()
         num = len(regions)
         x = len(self.view.substr(regions[0]))
-        # select the whole document if there is no user selection
+        # Select the whole document if there is no user selection
         if num <= 1 and x == 0:
             regions.clear()
             regions.add(sublime.Region(0, view_size))
 
-        # encrypt / decrypt selections
+        # For each text selection region
         for region in regions:
             data = self.view.substr(region)
-            results = transcrypt(self.view, enc, password, data)
-            if results:
-                self.view.replace(edit, region, results)
+            # Encrypt or decrypt selection
+            try:
+                result = crypt(password, data, enc)
+            except WrongPasswordException:
+                panel(self.view.window(), "Error: Wrong password")
+                result = ''
+            except BadPaddingException:
+                panel(self.view.window(),
+                      "Error: Input is not valid output of AES encryption, sure it's been encrypted?")
+                result = ''
+
+            if result:
+                # Replace selection with encrypted output
+                self.view.replace(edit, region, result)
+        self.view.end_edit(edit)
