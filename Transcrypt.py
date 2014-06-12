@@ -36,13 +36,15 @@ class TranscryptEventListener(sublime_plugin.EventListener):
     '''
 
     def on_pre_save(self, view, encode=False):
-        if view.settings().get('TRANSCRYPT_ON_SAVE') and not view.settings().get('ENCODED'):
+        if view.settings().get('ON_SAVE') and not view.settings().get('ENCODED'):
             self.view = view
             message = "Create a Password:"
-            view.window().show_input_panel(message, "", self.on_done, None, None)
+            view.window().show_input_panel(
+                message, "", self.on_done, None, None)
 
     def on_done(self, password):
-        self.view.run_command("transcrypt", {"enc": True, "password": password})
+        self.view.run_command(
+            "transcrypt", {"enc": True, "password": password})
         self.view.settings().set('ENCODED', True)
         self.view.run_command('save')
         self.view.settings().set('ENCODED', False)
@@ -52,15 +54,15 @@ class TranscryptToggleOnSaveCommand(sublime_plugin.WindowCommand):
 
     def run(self):
         view = self.window.active_view()
-        on_save = view.settings().get('TRANSCRYPT_ON_SAVE')
+        on_save = view.settings().get('ON_SAVE')
         # even if setting not set, 'not None == True'
         on_save = not on_save
         on_save_status = 'Encrypt on save' if on_save else ''
-        view.settings().set('TRANSCRYPT_ON_SAVE', on_save)
-        view.set_status('TRANSCRYPT_ON_SAVE', on_save_status)
+        view.settings().set('ON_SAVE', on_save)
+        view.set_status('ON_SAVE', on_save_status)
 
     def is_checked(self):
-        return bool(self.window.active_view().settings().get('TRANSCRYPT_ON_SAVE'))
+        return bool(self.window.active_view().settings().get('ON_SAVE'))
 
 
 class TranscryptPasswordCommand(sublime_plugin.WindowCommand):
