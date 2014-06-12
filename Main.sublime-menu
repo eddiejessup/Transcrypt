@@ -17,12 +17,9 @@
         "args": {"enc": false}
       },
       {
-        "caption": "Enable encrypt on save",
-        "command": "transcrypt_toggle_on_save", "args": {"on_save": true}
-      },
-      {
-        "caption": "Disable encrypt on save",
-        "command": "transcrypt_toggle_on_save", "args": {"on_save": false}
+        "caption": "Toggle encrypt on save",
+        "command": "transcrypt_toggle_on_save",
+        "checkbox": true
       }
     ]
   }]

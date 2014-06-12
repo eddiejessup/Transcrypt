@@ -42,13 +42,17 @@ class TranscryptEventListener(sublime_plugin.EventListener):
 
 class TranscryptToggleOnSaveCommand(sublime_plugin.WindowCommand):
 
-    def run(self, on_save):
-        self.window.active_view().settings().set('TRANSCRYPT_ON_SAVE', on_save)
-        if on_save:
-            on_save_status = 'Encrypt on save'
-        else:
-            on_save_status = ''
-        self.window.active_view().set_status('TRANSCRYPT_ON_SAVE', on_save_status)
+    def run(self):
+        view = self.window.active_view()
+        on_save = view.settings().get('TRANSCRYPT_ON_SAVE')
+        # even if setting not set, 'not None == True'
+        on_save = not on_save
+        on_save_status = 'Encrypt on save' if on_save else ''
+        view.settings().set('TRANSCRYPT_ON_SAVE', on_save)
+        view.set_status('TRANSCRYPT_ON_SAVE', on_save_status)
+
+    def is_checked(self):
+        return bool(self.window.active_view().settings().get('TRANSCRYPT_ON_SAVE'))
 
 
 class TranscryptPasswordCommand(sublime_plugin.WindowCommand):

@@ -11,8 +11,11 @@
         "caption": "Decrypt",
         "command": "transcrypt_password",
         "args": {"enc": false}
+    },
+    {
+        "caption":"Toggle encrypt on save",
+        "command":"transcrypt_toggle_on_save",
+        "checkbox": true
     }
-    { "id":"transcrypt_enable_on_save", "caption": "Enable encrypt on save", "command": "transcrypt_toggle_on_save", "args": {"on_save": true} },
-    { "id":"transcrypt_disable_on_save", "caption": "Disable encrypt on save", "command": "transcrypt_toggle_on_save", "args": {"on_save": false} }
   ]
 }]
