@@ -13,11 +13,11 @@ Clone this repository into `Sublime Text 3/Packages` using OS-appropriate locati
 
 OSX:
 
-    git clone git://github.com/eddiejessup/SublimeText-Transcrypt.git ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/Transcrypt
+    git clone git://github.com/eddiejessup/Transcrypt.git ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/Transcrypt
 
 Windows:
 
-    git clone git://github.com/eddiejessup/SublimeText-Transcrypt.git "%APPDATA%\Sublime Text 3\Packages\Transcrypt"
+    git clone git://github.com/eddiejessup/Transcrypt.git "%APPDATA%\Sublime Text 3\Packages\Transcrypt"
 
 Usage
 -----
