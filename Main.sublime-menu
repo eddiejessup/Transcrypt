@@ -5,12 +5,13 @@
   "children": [{
     "id": "transcryptmenu",
     "caption": "Transcrypt",
-    "children": [{
-        "caption": "Transcrypt::Encrypt",
+    "children": [
+      {
+        "caption": "Encrypt",
         "command": "transcrypt_password", "args": {"enc": true}
       },
       {
-        "caption": "Transcrypt::Decrypt",
+        "caption": "Decrypt",
         "command": "transcrypt_password", "args": {"enc": false}
       },
       {
