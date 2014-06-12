@@ -19,6 +19,10 @@ Windows:
 
     git clone git://github.com/eddiejessup/Transcrypt.git "%APPDATA%\Sublime Text 3\Packages\Transcrypt"
 
+Linux:
+
+    git clone git://github.com/eddiejessup/Transcrypt.git ~/.config/sublime-text-3/Packages/Transcrypt
+
 Usage
 -----
 Access `Encrypt` and `Decrypt` via:
