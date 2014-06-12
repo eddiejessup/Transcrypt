@@ -7,4 +7,15 @@
   "caption": "Transcrypt::Decrypt",
   "command": "transcrypt_password",
   "args": {"enc": false }
-}]
+},
+{
+  "caption": "Transcrypt::EnableOnSave",
+  "command": "transcrypt_toggle_on_save",
+  "args": { "on_save": true }
+},
+{
+  "caption": "Transcrypt::DisableOnSave",
+  "command": "transcrypt_toggle_on_save",
+  "args": { "on_save": false }
+}
+]

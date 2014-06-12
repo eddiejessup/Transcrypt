@@ -27,11 +27,28 @@ class WrongPasswordException(Exception):
 
 
 class TranscryptEventListener(sublime_plugin.EventListener):
-    def on_pre_save(self, view):
-        if view.settings().get('TRANSCRYPT_ONSAVE'):
-            view().run_command("transcrypt_password", {"enc": True})
-        print('hey boy')
-        super().on_pre_save(view)
+    def on_pre_save(self, view, encode=False):
+        if view.settings().get('TRANSCRYPT_ON_SAVE') and not view.settings().get('ENCODED'):
+            self.view = view
+            message = "Create a Password:"
+            view.window().show_input_panel(message, "", self.on_done, None, None)
+
+    def on_done(self, password):
+        self.view.run_command("transcrypt", {"enc": True, "password": password})
+        self.view.settings().set('ENCODED', True)
+        self.view.run_command('save')
+        self.view.settings().set('ENCODED', False)
+
+
+class TranscryptToggleOnSaveCommand(sublime_plugin.WindowCommand):
+
+    def run(self, on_save):
+        self.window.active_view().settings().set('TRANSCRYPT_ON_SAVE', on_save)
+        if on_save:
+            on_save_status = 'Encrypt on save'
+        else:
+            on_save_status = ''
+        self.window.active_view().set_status('TRANSCRYPT_ON_SAVE', on_save_status)
 
 
 class TranscryptPasswordCommand(sublime_plugin.WindowCommand):
