@@ -1,4 +1,5 @@
 [
   {"keys": ["ctrl+k", "e"], "command": "transcrypt_password", "args": {"enc": true}},
-  {"keys": ["ctrl+k", "d"], "command": "transcrypt_password", "args": {"enc": false}}
+  {"keys": ["ctrl+k", "d"], "command": "transcrypt_password", "args": {"enc": false}},
+  {"keys": ["ctrl+k", "ctrl+e"], "command": "transcrypt_toggle_on_save"}
 ]
