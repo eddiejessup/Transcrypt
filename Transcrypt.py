@@ -32,7 +32,6 @@ class TranscryptPasswordCommand(sublime_plugin.WindowCommand):
         self.enc = enc
         message = "Create a Password:" if enc else "Enter Password:"
         self.window.show_input_panel(message, "", self.on_done, None, None)
-        pass
 
     def on_done(self, password):
         try:
@@ -41,12 +40,6 @@ class TranscryptPasswordCommand(sublime_plugin.WindowCommand):
                     "transcrypt", {"enc": self.enc, "password": password})
         except ValueError:
             pass
-
-
-class TranscryptMessageCommand(sublime_plugin.TextCommand):
-
-    def run(self, edit, message):
-        self.view.insert(edit, self.view.size(), message)
 
 
 def panel(window, message):
@@ -133,3 +126,4 @@ class TranscryptCommand(sublime_plugin.TextCommand):
             if result:
                 # Replace selection with encrypted output
                 self.view.replace(edit, region, result)
+        self.view.end_edit(edit)
