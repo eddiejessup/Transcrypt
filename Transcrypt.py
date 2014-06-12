@@ -27,6 +27,14 @@ class WrongPasswordException(Exception):
 
 
 class TranscryptEventListener(sublime_plugin.EventListener):
+
+    '''
+    Before the view is saved, prompt for a password and encrypt the view.
+    Even though callback is attached to pre_save, Sublime Text saves before
+    a password is input by the user, so need to save again explicitly,
+    and use a flag to stop the encoding prompt appearing again.
+    '''
+
     def on_pre_save(self, view, encode=False):
         if view.settings().get('TRANSCRYPT_ON_SAVE') and not view.settings().get('ENCODED'):
             self.view = view
