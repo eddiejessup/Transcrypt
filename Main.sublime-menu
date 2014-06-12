@@ -8,13 +8,16 @@
     "children": [
       {
         "caption": "Encrypt",
-        "command": "transcrypt_password", "args": {"enc": true}
+        "command": "transcrypt_password",
+        "args": {"enc": true}
       },
       {
         "caption": "Decrypt",
-        "command": "transcrypt_password", "args": {"enc": false}
-      }]
-    }]
+        "command": "transcrypt_password",
+        "args": {"enc": false}
+      }
+    ]
+  }]
 },{
   "caption": "Preferences",
   "mnemonic": "n",
