@@ -30,8 +30,8 @@ Access `Encrypt` and `Decrypt` via:
 - Right-click menu item `Transcrypt`
 - Menu item `Tools -> Transcrypt`
 - Default keyboard shortcuts:
-  - Encrypt: `⌘+K, e` (OSX) or `ctrl+K, e` (Linux and Windows)
-  - Decrypt: `⌘+K, d` (OSX) or `ctrl+K, d` (Linux and Windows)
+  - Encrypt: `⌘+k, e` (OSX) or `ctrl+k, e` (Linux and Windows)
+  - Decrypt: `⌘+k, d` (OSX) or `ctrl+k, d` (Linux and Windows)
 
 The commands work on a selection, multiple selections or if nothing is selected, the whole document. Once you trigger the command you will be prompted to enter a password.
 
