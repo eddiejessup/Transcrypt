@@ -21,15 +21,30 @@ Windows:
 
 Usage
 -----
-Access `Encrypt` and `Decrypt` via:
+Access commands via:
 
 - Right-click menu item `Transcrypt`
 - Menu item `Tools -> Transcrypt`
 - Default keyboard shortcuts:
   - Encrypt: `⌘+K, e` (OSX) or `ctrl+K, e` (Linux and Windows)
   - Decrypt: `⌘+K, d` (OSX) or `ctrl+K, d` (Linux and Windows)
+  - Toggle 'encrypt on save' mode: `⌘+k, ⌘+e` (OSX) or `ctrl+k, ctrl+e` (Linux and Windows)
 
 The commands work on a selection, multiple selections or if nothing is selected, the whole document. Once you trigger the command you will be prompted to enter a password.
+
+### 'Encrypt on save'
+
+If this mode is enabled, the default save shortcut (`⌘+s` in OSX or `ctrl+s` in Linux and Windows) instead opens a password encryption prompt, and only if a password is entered is the document encrypted and saved. If the encryption is cancelled, the file is not saved. This should help to prevent accidentally saving your private file in plaintext.
+
+The mode is toggled on a per-file basis, and should persist as long as the file is open.
+
+When the mode is enabled for a file, 'Encrypt on save' will appear in the status bar (lower left) when viewing that file.
+
+Notes:
+
+- The menu entry for `save` is not changed, so normal saving can still be done if required (or you can simply disable the mode).
+- If you've changed the default key binding for `save` to something else, this won't be remapped automatically (though it can of course be changed manually)
+- This feature is experimental, use at your own risk!
 
 Requirements
 ------------
