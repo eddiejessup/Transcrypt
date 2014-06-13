@@ -13,11 +13,15 @@ Clone this repository into `Sublime Text 3/Packages` using OS-appropriate locati
 
 OSX:
 
-    git clone git://github.com/eddiejessup/SublimeText-Transcrypt.git ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/Transcrypt
+    git clone git://github.com/eddiejessup/Transcrypt.git ~/Library/Application\ Support/Sublime\ Text\ 3/Packages/Transcrypt
 
 Windows:
 
-    git clone git://github.com/eddiejessup/SublimeText-Transcrypt.git "%APPDATA%\Sublime Text 3\Packages\Transcrypt"
+    git clone git://github.com/eddiejessup/Transcrypt.git "%APPDATA%\Sublime Text 3\Packages\Transcrypt"
+
+Linux:
+
+    git clone git://github.com/eddiejessup/Transcrypt.git ~/.config/sublime-text-3/Packages/Transcrypt
 
 Usage
 -----
@@ -26,8 +30,8 @@ Access commands via:
 - Right-click menu item `Transcrypt`
 - Menu item `Tools -> Transcrypt`
 - Default keyboard shortcuts:
-  - Encrypt: `⌘+K, e` (OSX) or `ctrl+K, e` (Linux and Windows)
-  - Decrypt: `⌘+K, d` (OSX) or `ctrl+K, d` (Linux and Windows)
+  - Encrypt: `⌘+k, e` (OSX) or `ctrl+k, e` (Linux and Windows)
+  - Decrypt: `⌘+k, d` (OSX) or `ctrl+k, d` (Linux and Windows)
   - Toggle 'encrypt on save' mode: `⌘+k, ⌘+e` (OSX) or `ctrl+k, ctrl+e` (Linux and Windows)
 
 The commands work on a selection, multiple selections or if nothing is selected, the whole document. Once you trigger the command you will be prompted to enter a password.
