@@ -36,18 +36,16 @@ class TranscryptEventListener(sublime_plugin.EventListener):
     '''
 
     def on_pre_save(self, view, encode=False):
-        if view.settings().get('ON_SAVE') and not view.settings().get('ENCODED'):
-            self.view = view
-            message = "Create a Password:"
-            view.window().show_input_panel(
-                message, "", self.on_done, None, None)
 
-    def on_done(self, password):
-        self.view.run_command(
-            "transcrypt", {"enc": True, "password": password})
-        self.view.settings().set('ENCODED', True)
-        self.view.run_command('save')
-        self.view.settings().set('ENCODED', False)
+        def on_done(password):
+            view.run_command("transcrypt", {"enc": True, "password": password})
+            view.settings().set('ENCODED', True)
+            view.run_command('save')
+            view.settings().set('ENCODED', False)
+
+        if view.settings().get('ON_SAVE') and not view.settings().get('ENCODED'):
+            message = "Create a Password:"
+            view.window().show_input_panel(message, "", on_done, None, None)
 
 
 class TranscryptToggleOnSaveCommand(sublime_plugin.WindowCommand):
