@@ -1,5 +1,6 @@
 [
   {"keys": ["super+k", "e"], "command": "transcrypt_password", "args": {"enc": true}},
   {"keys": ["super+k", "d"], "command": "transcrypt_password", "args": {"enc": false}},
-  {"keys": ["super+k", "super+e"], "command": "transcrypt_toggle_on_save"}
+  {"keys": ["super+k", "super+e"], "command": "transcrypt_toggle_on_save"},
+  {"keys": ["super+s"], "command": "transcrypt_save"}
 ]

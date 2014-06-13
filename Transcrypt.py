@@ -26,26 +26,28 @@ class WrongPasswordException(Exception):
     pass
 
 
-class TranscryptEventListener(sublime_plugin.EventListener):
+class TranscryptSaveCommand(sublime_plugin.TextCommand):
 
-    '''
-    Before the view is saved, prompt for a password and encrypt the view.
-    Even though callback is attached to pre_save, Sublime Text saves before
-    a password is input by the user, so need to save again explicitly,
-    and use a flag to stop the encoding prompt appearing again.
-    '''
-
-    def on_pre_save(self, view, encode=False):
-
+    def run(self, edit):
+        '''
+        If encrypt on save is enabled, save just displays an encryption
+        dialog, encrypts, then saves.
+        If encrypt on save is disabled, just call normal save.
+        '''
         def on_done(password):
-            view.run_command("transcrypt", {"enc": True, "password": password})
-            view.settings().set('ENCODED', True)
-            view.run_command('save')
-            view.settings().set('ENCODED', False)
+            self.view.run_command(
+                "transcrypt", {"enc": True, "password": password})
+            self.view.run_command('save')
 
-        if view.settings().get('ON_SAVE') and not view.settings().get('ENCODED'):
+        # End edit immediately because we aren't doing any editing
+        self.view.end_edit(edit)
+
+        if self.view.settings().get('ON_SAVE'):
             message = "Create a Password:"
-            view.window().show_input_panel(message, "", on_done, None, None)
+            self.view.window().show_input_panel(
+                message, "", on_done, None, None)
+        else:
+            self.view.run_command('save')
 
 
 class TranscryptToggleOnSaveCommand(sublime_plugin.WindowCommand):
@@ -53,7 +55,7 @@ class TranscryptToggleOnSaveCommand(sublime_plugin.WindowCommand):
     def run(self):
         view = self.window.active_view()
         on_save = view.settings().get('ON_SAVE')
-        # even if setting not set, 'not None == True'
+        # This works even if setting not set: since 'not None == True'
         on_save = not on_save
         on_save_status = 'Encrypt on save' if on_save else ''
         view.settings().set('ON_SAVE', on_save)
