@@ -26,6 +26,45 @@ class WrongPasswordException(Exception):
     pass
 
 
+class TranscryptSaveCommand(sublime_plugin.TextCommand):
+
+    def run(self, edit):
+        '''
+        If encrypt on save is enabled, save just displays an encryption
+        dialog, encrypts, then saves.
+        If encrypt on save is disabled, just call normal save.
+        '''
+        def on_done(password):
+            self.view.run_command(
+                "transcrypt", {"enc": True, "password": password})
+            self.view.run_command('save')
+
+        # End edit immediately because we aren't doing any editing
+        self.view.end_edit(edit)
+
+        if self.view.settings().get('ON_SAVE'):
+            message = "Create a Password:"
+            self.view.window().show_input_panel(
+                message, "", on_done, None, None)
+        else:
+            self.view.run_command('save')
+
+
+class TranscryptToggleOnSaveCommand(sublime_plugin.WindowCommand):
+
+    def run(self):
+        view = self.window.active_view()
+        on_save = view.settings().get('ON_SAVE')
+        # This works even if setting not set: since 'not None == True'
+        on_save = not on_save
+        on_save_status = 'Encrypt on save' if on_save else ''
+        view.settings().set('ON_SAVE', on_save)
+        view.set_status('ON_SAVE', on_save_status)
+
+    def is_checked(self):
+        return bool(self.window.active_view().settings().get('ON_SAVE'))
+
+
 class TranscryptPasswordCommand(sublime_plugin.WindowCommand):
 
     def run(self, enc):

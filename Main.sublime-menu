@@ -15,6 +15,11 @@
         "caption": "Decrypt",
         "command": "transcrypt_password",
         "args": {"enc": false}
+      },
+      {
+        "caption": "Toggle encrypt on save",
+        "command": "transcrypt_toggle_on_save",
+        "checkbox": true
       }
     ]
   }]
