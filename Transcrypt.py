@@ -19,10 +19,10 @@ import bisect
 from sys import platform as _platform
 if _platform == "linux" or _platform == "linux2":
     # linux
-    from Transcrypt.Crypto import AES
+    raise ImportError
 elif _platform == "darwin":
     # OS X
-    raise ImportError
+    from Transcrypt.Crypto import AES
 elif _platform == "win32":
     # Windows
     from sys import maxsize as _maxsize
