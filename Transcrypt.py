@@ -15,7 +15,23 @@ import sublime
 import sublime_plugin
 import base64
 import bisect
-from Transcrypt.Crypto import AES
+
+from sys import platform as _platform
+if _platform == "linux" or _platform == "linux2":
+    # linux
+    from Transcrypt.Crypto import AES
+elif _platform == "darwin":
+    # OS X
+    raise ImportError
+elif _platform == "win32":
+    # Windows
+    from sys import maxsize as _maxsize
+    # is_64bits = '64bit' == platform.architecture()[0]
+    is_64bits = _maxsize > 2**32
+    if is_64bits:
+        from Transcrypt.Cryptowin64 import AES
+    else:
+        from Transcrypt.Cryptowin32 import AES
 
 
 class BadPaddingException(Exception):
