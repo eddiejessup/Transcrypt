@@ -22,7 +22,7 @@ import sys
 
 
 BASE_PATH = os.path.abspath(os.path.dirname(__file__))
-CRYPTO_APTH = os.path.join(BASE_PATH, "Crypto")
+CRYPTO_PATH = os.path.join(BASE_PATH, "Crypto")
 
 is_python3 = sys.version_info[0] > 2
 
@@ -33,22 +33,23 @@ def get_zipfile_path():
     """Return the zipfile path according to platform."""
     if _platform == "darwin":
         # OS X
-        return os.path.join(CRYPTO_APTH, "macos.zip")
+        zip_fname = "macos.zip"
     elif _platform == "linux" or _platform == "linux2":
         # linux
         is_64bits = _maxsize > 2**32
         if is_64bits:
-            return os.path.join(CRYPTO_APTH, "linux64.zip")
+            zip_fname = "linux64.zip"
         else:
-            return os.path.join(CRYPTO_APTH, "linux32.zip")
+            zip_fname = "linux32.zip"
     elif _platform == "win32":
         # Windows
         # is_64bits = '64bit' == platform.architecture()[0]
         is_64bits = _maxsize > 2**32
         if is_64bits:
-            return os.path.join(CRYPTO_APTH, "win64.zip")
+            zip_fname = "win64.zip"
         else:
-            return os.path.join(CRYPTO_APTH, "win32.zip")
+            zip_fname = "win32.zip"
+    return os.path.join(CRYPTO_PATH, zip_fname)
 
 
 def init():
@@ -60,7 +61,7 @@ def init():
         ZIP_FILE_PATH = get_zipfile_path()
         if os.path.isfile(ZIP_FILE_PATH):
             with zipfile.ZipFile(ZIP_FILE_PATH, "r") as f:
-                f.extractall(CRYPTO_APTH)
+                f.extractall(CRYPTO_PATH)
         try:
             from Transcrypt.Crypto import AES
         except ImportError:
