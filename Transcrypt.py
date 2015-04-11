@@ -32,12 +32,17 @@ AES = None
 
 def get_zipfile_path():
     """Return the zipfile path according to platform."""
-    if _platform == "linux" or _platform == "linux2":
-        # linux
-        return None  # Not supported right now.
-    elif _platform == "darwin":
+    if _platform == "darwin":
         # OS X
         return os.path.join(CRYPTO_APTH, "macos.zip")
+        
+    elif _platform == "linux" or _platform == "linux2":
+        # linux
+        is_64bits = _maxsize > 2**32
+        if is_64bits:
+            return os.path.join(CRYPTO_APTH, "linux64.zip")
+        else:
+            return os.path.join(CRYPTO_APTH, "linux32.zip")
     elif _platform == "win32":
         # Windows
         # is_64bits = '64bit' == platform.architecture()[0]
