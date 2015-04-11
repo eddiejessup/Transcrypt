@@ -225,6 +225,3 @@ class TranscryptCommand(sublime_plugin.TextCommand):
 def plugin_loaded():
     """Load and unzip the pre-built binary files, if needed."""
     sublime.set_timeout(init, 200)
-
-
-init()
