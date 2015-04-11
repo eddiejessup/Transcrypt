@@ -15,23 +15,55 @@ import sublime
 import sublime_plugin
 import base64
 import bisect
-
+import os
 from sys import platform as _platform
-if _platform == "linux" or _platform == "linux2":
-    # linux
-    raise ImportError
-elif _platform == "darwin":
-    # OS X
-    from Transcrypt.Crypto import AES
-elif _platform == "win32":
-    # Windows
-    from sys import maxsize as _maxsize
-    # is_64bits = '64bit' == platform.architecture()[0]
-    is_64bits = _maxsize > 2**32
-    if is_64bits:
-        from Transcrypt.Cryptowin64 import AES
-    else:
-        from Transcrypt.Cryptowin32 import AES
+from sys import maxsize as _maxsize
+import sys
+
+
+BASE_PATH = os.path.abspath(os.path.dirname(__file__))
+# PACKAGES_PATH = sublime.packages_path() or os.path.dirname(BASE_PATH)
+CRYPTO_APTH = os.path.join(BASE_PATH, "Crypto")
+
+is_python3 = sys.version_info[0] > 2
+
+AES = None
+
+
+def get_zipfile_path():
+    """Return the zipfile path according to platform."""
+    if _platform == "linux" or _platform == "linux2":
+        # linux
+        return None  # Not supported right now.
+    elif _platform == "darwin":
+        # OS X
+        return os.path.join(CRYPTO_APTH, "macos.zip")
+    elif _platform == "win32":
+        # Windows
+        # is_64bits = '64bit' == platform.architecture()[0]
+        is_64bits = _maxsize > 2**32
+        if is_64bits:
+            return os.path.join(CRYPTO_APTH, "win64.zip")
+        else:
+            return os.path.join(CRYPTO_APTH, "win32.zip")
+
+
+def init():
+    """Load AES pre-build binary."""
+    import zipfile
+    try:
+        from Transcrypt.Crypto import AES
+    except ImportError:
+        ZIP_FILE_PATH = get_zipfile_path()
+        if os.path.isfile(ZIP_FILE_PATH):
+            with zipfile.ZipFile(ZIP_FILE_PATH, "r") as f:
+                f.extractall(CRYPTO_APTH)
+        try:
+            from Transcrypt.Crypto import AES
+        except ImportError:
+            raise Exception("Can not load AES, return")
+            return
+    globals()['AES'] = AES
 
 
 class BadPaddingException(Exception):
@@ -182,3 +214,13 @@ class TranscryptCommand(sublime_plugin.TextCommand):
                 # Replace selection with encrypted output
                 self.view.replace(edit, region, result)
         self.view.end_edit(edit)
+
+
+def plugin_loaded():
+    """Load and unzip the pre-build binary files."""
+    sublime.set_timeout(init, 200)
+
+##################
+# Init plugin
+if not is_python3:
+    init()
