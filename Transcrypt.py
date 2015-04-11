@@ -57,10 +57,10 @@ def init():
     '''
     Load AES pre-built binaries.
     '''
-    import zipfile
     try:
         from Transcrypt.Crypto import AES
     except ImportError:
+        import zipfile
         ZIP_FILE_PATH = get_zipfile_path()
         if os.path.isfile(ZIP_FILE_PATH):
             with zipfile.ZipFile(ZIP_FILE_PATH, "r") as f:
