@@ -30,21 +30,22 @@ AES = None
 
 
 def get_zipfile_path():
-    """Return the zipfile path according to platform."""
+    '''
+    Return the zipfile path according to the platform.
+    '''
     if _platform == "darwin":
         # OS X
         zip_fname = "macos.zip"
     elif _platform == "linux" or _platform == "linux2":
         # linux
-        is_64bits = _maxsize > 2**32
+        is_64bits = _maxsize > 2 ** 32
         if is_64bits:
             zip_fname = "linux64.zip"
         else:
             zip_fname = "linux32.zip"
     elif _platform == "win32":
         # Windows
-        # is_64bits = '64bit' == platform.architecture()[0]
-        is_64bits = _maxsize > 2**32
+        is_64bits = _maxsize > 2 ** 32
         if is_64bits:
             zip_fname = "win64.zip"
         else:
@@ -53,7 +54,9 @@ def get_zipfile_path():
 
 
 def init():
-    """Load AES pre-build binary."""
+    '''
+    Load AES pre-built binaries.
+    '''
     import zipfile
     try:
         from Transcrypt.Crypto import AES
@@ -211,7 +214,8 @@ class TranscryptCommand(sublime_plugin.TextCommand):
                 result = ''
             except BadPaddingException:
                 panel(self.view.window(),
-                      "Error: Input is not valid output of AES encryption, sure it's been encrypted?")
+                      "Error: Input is not valid output of AES encryption, "
+                      "sure it's been encrypted?")
                 result = ''
 
             if result:
@@ -221,7 +225,9 @@ class TranscryptCommand(sublime_plugin.TextCommand):
 
 
 def plugin_loaded():
-    """Load and unzip the pre-build binary files."""
+    '''
+    Load and unzip the pre-built binary files, if needed.
+    '''
     sublime.set_timeout(init, 200)
 
 ##################
