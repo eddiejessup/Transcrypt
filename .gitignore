@@ -3,3 +3,8 @@
 *.py[co]
 .DS_Store
 __pycache__/
+Crypto/_AES.so
+Crypto/_counter.so
+Crypto/cpuid.so
+Crypto/galois.so
+Crypto/strxor.so
