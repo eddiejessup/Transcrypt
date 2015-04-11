@@ -1,4 +1,4 @@
-'''
+"""
 @name     Transcrypt
 @package  sublime_plugin
 @author   Elliot Marsden
@@ -8,8 +8,7 @@ features to the right click context menu.
 
 Usage: Make a selection (or not), Choose AES Encrypt or AES Decrypt
 from the context menu and then enter a password
-
-'''
+"""
 
 import sublime
 import sublime_plugin
@@ -30,9 +29,7 @@ AES = None
 
 
 def get_zipfile_path():
-    '''
-    Return the zipfile path according to the platform.
-    '''
+    """Return the zipfile path according to the platform."""
     if _platform == "darwin":
         # OS X
         zip_fname = "macos.zip"
@@ -54,9 +51,7 @@ def get_zipfile_path():
 
 
 def init():
-    '''
-    Load AES pre-built binaries.
-    '''
+    """Load AES pre-built binaries."""
     try:
         from Transcrypt.Crypto import AES
     except ImportError:
@@ -84,11 +79,12 @@ class WrongPasswordException(Exception):
 class TranscryptSaveCommand(sublime_plugin.TextCommand):
 
     def run(self, edit):
-        '''
-        If encrypt on save is enabled, save just displays an encryption
-        dialog, encrypts, then saves.
-        If encrypt on save is disabled, just call normal save.
-        '''
+        """Do relevant command.
+
+        If encrypt on save is enabled, display an encryption dialog,
+        encrypt, then save.
+        If encrypt on save is disabled, just save.
+        """
         def on_done(password):
             self.view.run_command(
                 "transcrypt", {"enc": True, "password": password})
@@ -144,10 +140,11 @@ def panel(window, message):
 
 
 def key_round(key_b):
-    '''
+    """Pad or truncate a key to be compatible with AES encryption.
+
     Pad or truncate key_b (assumed to be bytes) as needed to be compatible
     with AES encryption: of length 16, 24 or 32.
-    '''
+    """
     key_len = len(key_b)
     key_sizes = [16, 24, 32]
     # Pad
@@ -160,11 +157,12 @@ def key_round(key_b):
 
 
 def crypt(key_text, input_text, enc):
-    '''
+    """Encrypt or decrypt text using a key.
+
     Encrypt ('enc' == True) or decrypt ('enc' == False) unicode string
     'input_text' using AES algorithm using unicode string 'key_text'
     as the encryption key (padded or truncated as needed).
-    '''
+    """
     key_b = key_text.encode('utf-8')
     key_b_round = key_round(key_b)
     secret = AES.new(key_b_round)
@@ -225,9 +223,7 @@ class TranscryptCommand(sublime_plugin.TextCommand):
 
 
 def plugin_loaded():
-    '''
-    Load and unzip the pre-built binary files, if needed.
-    '''
+    """Load and unzip the pre-built binary files, if needed."""
     sublime.set_timeout(init, 200)
 
 
