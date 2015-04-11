@@ -22,7 +22,6 @@ import sys
 
 
 BASE_PATH = os.path.abspath(os.path.dirname(__file__))
-# PACKAGES_PATH = sublime.packages_path() or os.path.dirname(BASE_PATH)
 CRYPTO_APTH = os.path.join(BASE_PATH, "Crypto")
 
 is_python3 = sys.version_info[0] > 2
@@ -35,7 +34,6 @@ def get_zipfile_path():
     if _platform == "darwin":
         # OS X
         return os.path.join(CRYPTO_APTH, "macos.zip")
-        
     elif _platform == "linux" or _platform == "linux2":
         # linux
         is_64bits = _maxsize > 2**32
