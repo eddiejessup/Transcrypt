@@ -230,7 +230,5 @@ def plugin_loaded():
     '''
     sublime.set_timeout(init, 200)
 
-##################
-# Init plugin
-if not is_python3:
-    init()
+
+init()
