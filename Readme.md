@@ -71,6 +71,7 @@ Author & Contributors
 - [Isaac Muse](https://github.com/facelessuser)
 - [Richard Mitchell](https://github.com/mitchellrj)
 - [Dwayne Litzenberger](https://github.com/dlitz)
+- [rexdf](https://github.com/rexdf)
 
 License
 -------
