@@ -72,6 +72,7 @@ Author & Contributors
 - [Richard Mitchell](https://github.com/mitchellrj)
 - [Dwayne Litzenberger](https://github.com/dlitz)
 - [rexdf](https://github.com/rexdf)
+- [auz9](https://github.com/auz9)
 
 License
 -------
