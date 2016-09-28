@@ -77,7 +77,6 @@ class WrongPasswordException(Exception):
 
 
 class TranscryptSaveCommand(sublime_plugin.TextCommand):
-    pwd = ""
 
     def run(self, edit):
         """Do relevant command.
@@ -86,38 +85,20 @@ class TranscryptSaveCommand(sublime_plugin.TextCommand):
         encrypt, then save.
         If encrypt on save is disabled, just save.
         """
+        def on_done(password):
+            self.view.run_command(
+                "transcrypt", {"enc": True, "password": password})
+            self.view.run_command('save')
+
         # End edit immediately because we aren't doing any editing
         self.view.end_edit(edit)
 
         if self.view.settings().get('ON_SAVE'):
-            self.view.window().show_input_panel("Enter Password:", "", self.on_done, self.on_change, self.on_cancel)
+            message = "Create a Password:"
+            self.view.window().show_input_panel(
+                message, "", on_done, None, None)
         else:
-                self.view.run_command('save')
-
-    def on_done(self, password):
-        try:
-            if self.pwd.strip() == "":
-                panel(self.window, "No password provided")
-            else:
-                self.view.window().run_command("transcrypt", {"enc": True, "password": password})
-                self.view.window().run_command('save')
-        except ValueError:
-            pass
-
-    def on_change(self, password):
-        chg = password.replace("*","")
-        if len(password) < len(self.pwd):
-            self.pwd = self.pwd[:len(password)]
-        else:
-            self.pwd = self.pwd + chg
-        self.view.window().run_command("hide_panel")
-
-    def on_cancel(self):
-        if (self.pwd == "") :
-            pass
-        else:
-            stars = "*" * len(self.pwd)
-            self.view.window().show_input_panel("Enter Password:", stars, self.on_done, self.on_change, self.on_cancel)
+            self.view.run_command('save')
 
 
 class TranscryptToggleOnSaveCommand(sublime_plugin.WindowCommand):
@@ -136,37 +117,19 @@ class TranscryptToggleOnSaveCommand(sublime_plugin.WindowCommand):
 
 
 class TranscryptPasswordCommand(sublime_plugin.WindowCommand):
-    pwd = ""
+
     def run(self, enc):
         self.enc = enc
-        message = "Enter Password:"
-        self.window.show_input_panel(message, "", self.on_done, self.on_change, self.on_cancel)
+        message = "Create a Password:" if enc else "Enter Password:"
+        self.window.show_input_panel(message, "", self.on_done, None, None)
 
     def on_done(self, password):
         try:
-            if self.pwd.strip() == "":
-                panel(self.window, "No password provided")
-            else:
-                if self.window.active_view():
-                    self.window.active_view().run_command("transcrypt", {"enc": self.enc, "password": password})
+            if self.window.active_view():
+                self.window.active_view().run_command(
+                    "transcrypt", {"enc": self.enc, "password": password})
         except ValueError:
             pass
-
-    def on_change(self, password):
-        chg = password.replace("*","")
-        if len(password) < len(self.pwd):
-            self.pwd = self.pwd[:len(password)]
-        else:
-            self.pwd = self.pwd + chg
-        self.window.run_command("hide_panel")
-
-    def on_cancel(self):
-        if (self.pwd == "") :
-            pass
-        else:
-            stars = "*" * len(self.pwd)
-            self.window.show_input_panel("Enter Password:", stars, self.on_done, self.on_change, self.on_cancel)
-
 
 
 def panel(window, message):
