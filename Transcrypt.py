@@ -10,44 +10,41 @@ Usage: Make a selection (or not), Choose AES Encrypt or AES Decrypt
 from the context menu and then enter a password
 """
 
-import sublime
-import sublime_plugin
 import base64
 import bisect
 import os
-from sys import platform as _platform
-from sys import maxsize as _maxsize
+import zipfile
 import sys
+from functools import partial
+
+import sublime
+import sublime_plugin
 
 
 BASE_PATH = os.path.abspath(os.path.dirname(__file__))
 CRYPTO_PATH = os.path.join(BASE_PATH, "Crypto")
+IS_64BITS = sys.maxsize > 2 ** 32
 
-is_python3 = sys.version_info[0] > 2
+# Set the zipfile path according to the platform.
+if sys.platform == "darwin":
+    # OS X
+    ZIP_FILE_NAME = "macos.zip"
+elif sys.platform in ("linux", "linux2"):
+    # Linux.
+    if IS_64BITS:
+        ZIP_FILE_NAME = "linux64.zip"
+    else:
+        ZIP_FILE_NAME = "linux32.zip"
+elif sys.platform == "win32":
+    # Windows.
+    if IS_64BITS:
+        ZIP_FILE_NAME = "win64.zip"
+    else:
+        ZIP_FILE_NAME = "win32.zip"
+ZIP_FILE_PATH = os.path.join(CRYPTO_PATH, ZIP_FILE_NAME)
+
 
 AES = None
-
-
-def get_zipfile_path():
-    """Return the zipfile path according to the platform."""
-    if _platform == "darwin":
-        # OS X
-        zip_fname = "macos.zip"
-    elif _platform == "linux" or _platform == "linux2":
-        # linux
-        is_64bits = _maxsize > 2 ** 32
-        if is_64bits:
-            zip_fname = "linux64.zip"
-        else:
-            zip_fname = "linux32.zip"
-    elif _platform == "win32":
-        # Windows
-        is_64bits = _maxsize > 2 ** 32
-        if is_64bits:
-            zip_fname = "win64.zip"
-        else:
-            zip_fname = "win32.zip"
-    return os.path.join(CRYPTO_PATH, zip_fname)
 
 
 def init():
@@ -55,16 +52,13 @@ def init():
     try:
         from Transcrypt.Crypto import AES
     except ImportError:
-        import zipfile
-        ZIP_FILE_PATH = get_zipfile_path()
         if os.path.isfile(ZIP_FILE_PATH):
             with zipfile.ZipFile(ZIP_FILE_PATH, "r") as f:
                 f.extractall(CRYPTO_PATH)
         try:
             from Transcrypt.Crypto import AES
         except ImportError:
-            raise Exception("Can not load AES, return")
-            return
+            raise Exception("Can't load AES")
     globals()['AES'] = AES
 
 
@@ -76,7 +70,182 @@ class WrongPasswordException(Exception):
     pass
 
 
+C_PAD = b"\0"
+KEY_SIZES = [16, 24, 32]
+
+
+def normalize_key(key):
+    """Pad or truncate a key to be compatible with AES encryption.
+
+    Pad or truncate key (assumed to be bytes) as needed to be compatible
+    with AES encryption.
+    """
+    key_len = len(key)
+    # Pad
+    if key_len < max(KEY_SIZES):
+        next_biggest = KEY_SIZES[bisect.bisect_left(KEY_SIZES, key_len)]
+        return key + (next_biggest - key_len) * C_PAD
+    # Truncate
+    else:
+        return key[:max(KEY_SIZES)]
+
+
+def decrypt_bytes(secret, s):
+    """Decrypt byte string with a key.
+
+    Decrypt byte string 's' with the AES algorithm using secret 'secret',
+    removing padding as needed.
+    """
+    try:
+        return secret.decrypt(base64.b64decode(s)).rstrip(C_PAD)
+    except ValueError as e:
+        raise BadPaddingException
+
+
+def encrypt_bytes(secret, s):
+    """Encrypt byte string with a key.
+
+    Encrypt byte string 's' with the AES algorithm using secret 'secret',
+    padded as needed.
+    """
+    pad_nr = AES.block_size - (len(s) % AES.block_size)
+    return base64.b64encode(secret.encrypt(s + (pad_nr * C_PAD)))
+
+
+def transcrypt_text(input_text, key_text, enc, encoding='utf-8'):
+    secret = AES.new(normalize_key(key_text.encode(encoding)))
+    crypt_bytes_func = encrypt_bytes if enc else decrypt_bytes
+    output_bytes = crypt_bytes_func(secret, input_text.encode(encoding))
+    try:
+        return output_bytes.decode(encoding)
+    except UnicodeError:
+        if enc:
+            raise
+        else:
+            raise WrongPasswordException
+
+
+class SetContentsCommand(sublime_plugin.TextCommand):
+
+    def run(self, edit, text):
+        r = sublime.Region(0, self.view.size())
+        self.view.replace(edit, r, text)
+        self.view.end_edit(edit)
+
+
+class ShowPanelMessageCommand(sublime_plugin.WindowCommand):
+
+    def run(self, message):
+        v = self.window.create_output_panel('transcrypt_error')
+        v.run_command("set_contents", {"text": message})
+        self.window.run_command(
+            "show_panel",
+            {"panel": "output.transcrypt_error"},
+        )
+
+
+def show_panel_message(window, message):
+    window.run_command("show_panel_message", {"message": message})
+
+
+def get_input(window, message, callback):
+    window.show_input_panel(message, "", callback, None, None)
+
+
+class TranscryptCommand(sublime_plugin.TextCommand):
+
+    WRONG_PW_TEXT = "Error: Wrong password"
+    BAD_INPUT_TEXT = ("Error: Input is not valid output of AES encryption, "
+                      "sure it's been encrypted?")
+
+    def run(self, edit, enc, password):
+        # Save the document size.
+        view_size = self.view.size()
+
+        # Get selections.
+        regions = self.view.sel()
+        nr_regions = len(regions)
+        # Select the whole document if there is no selection.
+        if nr_regions <= 1 and len(self.view.substr(regions[0])) == 0:
+            regions.clear()
+            regions.add(sublime.Region(0, view_size))
+
+        # For each text selection region.
+        for region in regions:
+            data = self.view.substr(region)
+            try:
+                # Encrypt or decrypt the selection.
+                result = transcrypt_text(input_text=data,
+                                         key_text=password,
+                                         enc=enc)
+            except WrongPasswordException:
+                show_panel_message(self.view.window(), self.WRONG_PW_TEXT)
+            except BadPaddingException:
+                show_panel_message(self.view.window(), self.BAD_INPUT_TEXT)
+            else:
+                # Replace selection with encrypted output.
+                self.view.replace(edit, region, result)
+        self.view.end_edit(edit)
+
+
+def transcrypt(enc, view, password):
+    if view:
+        view.run_command(
+            "transcrypt",
+            {"enc": enc, "password": password}
+        )
+
+
+encrypt = partial(transcrypt, True)
+decrypt = partial(transcrypt, False)
+
+
+class EncryptCommand(sublime_plugin.WindowCommand):
+
+    SET_TEXT = "Set password:"
+    CONFIRM_TEXT = "Confirm new password:"
+    NO_MATCH_TEXT = "Error: Passwords do not match"
+
+    def run(self, save=False):
+        get_input(self.window, self.SET_TEXT,
+                  partial(self.confirm_then_encrypt, save=save))
+
+    def confirm_then_encrypt(self, password, save=False):
+        def check_then_transcrypt(password_confirm):
+            if password_confirm != password:
+                show_panel_message(self.window, self.NO_MATCH_TEXT)
+            else:
+                view = self.window.active_view()
+                encrypt(view=view, password=password)
+                if save:
+                    view.run_command('save')
+        get_input(self.window, self.CONFIRM_TEXT, check_then_transcrypt)
+
+
+class DecryptCommand(sublime_plugin.WindowCommand):
+
+    ENTER_TEXT = "Enter password:"
+
+    def run(self):
+        get_input(self.window, self.ENTER_TEXT,
+                  partial(decrypt, self.window.active_view()))
+
+
+# Related to encrypt-on-save.
+
 class TranscryptSaveCommand(sublime_plugin.TextCommand):
+
+    DEFAULT = False
+    ON_SAVE = 'ON_SAVE'
+
+    @classmethod
+    def on_save_is_active(cls, view):
+        var = view.settings().get(cls.ON_SAVE)
+        return cls.DEFAULT if var is None else var
+
+    @property
+    def is_active(self):
+        return self.on_save_is_active(self.view)
 
     def run(self, edit):
         """Do relevant command.
@@ -85,141 +254,34 @@ class TranscryptSaveCommand(sublime_plugin.TextCommand):
         encrypt, then save.
         If encrypt on save is disabled, just save.
         """
-        def on_done(password):
-            self.view.run_command(
-                "transcrypt", {"enc": True, "password": password})
-            self.view.run_command('save')
 
-        # End edit immediately because we aren't doing any editing
+        # End edit immediately because we aren't doing any editing.
         self.view.end_edit(edit)
 
-        if self.view.settings().get('ON_SAVE'):
-            message = "Create a Password:"
-            self.view.window().show_input_panel(
-                message, "", on_done, None, None)
+        if self.is_active:
+            self.view.window().run_command("encrypt_password", {'save': True})
         else:
             self.view.run_command('save')
 
 
-class TranscryptToggleOnSaveCommand(sublime_plugin.WindowCommand):
+class ToggleEncryptOnSaveCommand(sublime_plugin.WindowCommand):
+
+    ACTIVE_STATUS_TEXT = 'Encrypt on save'
+
+    @property
+    def active_view(self):
+        return self.window.active_view()
+
+    @property
+    def is_active(self):
+        return TranscryptSaveCommand.on_save_is_active(self.active_view)
 
     def run(self):
-        view = self.window.active_view()
-        on_save = view.settings().get('ON_SAVE')
-        # This works even if setting not set: since 'not None == True'
-        on_save = not on_save
-        on_save_status = 'Encrypt on save' if on_save else ''
-        view.settings().set('ON_SAVE', on_save)
-        view.set_status('ON_SAVE', on_save_status)
-
-    def is_checked(self):
-        return bool(self.window.active_view().settings().get('ON_SAVE'))
-
-
-class TranscryptPasswordCommand(sublime_plugin.WindowCommand):
-
-    def run(self, enc):
-        self.enc = enc
-        message = "Create a Password:" if enc else "Enter Password:"
-        self.window.show_input_panel(message, "", self.on_done, None, None)
-
-    def on_done(self, password):
-        try:
-            if self.window.active_view():
-                self.window.active_view().run_command(
-                    "transcrypt", {"enc": self.enc, "password": password})
-        except ValueError:
-            pass
-
-
-def panel(window, message):
-    p = window.get_output_panel('transcrypt_error')
-    p.run_command("transcrypt_message", {"message": message})
-    p.show(p.size())
-    window.run_command("show_panel", {"panel": "output.transcrypt_error"})
-
-
-def key_round(key_b):
-    """Pad or truncate a key to be compatible with AES encryption.
-
-    Pad or truncate key_b (assumed to be bytes) as needed to be compatible
-    with AES encryption: of length 16, 24 or 32.
-    """
-    key_len = len(key_b)
-    key_sizes = [16, 24, 32]
-    # Pad
-    if key_len < max(key_sizes):
-        next_biggest = key_sizes[bisect.bisect_left(key_sizes, key_len)]
-        return key_b + (next_biggest - key_len) * b'\0'
-    # Truncate
-    else:
-        return key_b[:max(key_sizes)]
-
-
-def crypt(key_text, input_text, enc):
-    """Encrypt or decrypt text using a key.
-
-    Encrypt ('enc' == True) or decrypt ('enc' == False) unicode string
-    'input_text' using AES algorithm using unicode string 'key_text'
-    as the encryption key (padded or truncated as needed).
-    """
-    key_b = key_text.encode('utf-8')
-    key_b_round = key_round(key_b)
-    secret = AES.new(key_b_round)
-    input_b = input_text.encode('utf-8')
-
-    if enc:
-        undershoot = len(input_b) % AES.block_size
-        input_b_pad = input_b + (AES.block_size - undershoot) * b'\0'
-        output_b = base64.b64encode(secret.encrypt(input_b_pad))
-        output_text = output_b.decode('utf-8')
-    else:
-        try:
-            output_b_pad = secret.decrypt(base64.b64decode(input_b))
-        except ValueError:
-            raise BadPaddingException
-        output_b = output_b_pad.rstrip(b"\0")
-        try:
-            output_text = output_b.decode('utf-8')
-        except UnicodeError:
-            raise WrongPasswordException
-
-    return output_text
-
-
-class TranscryptCommand(sublime_plugin.TextCommand):
-
-    def run(self, edit, enc, password):
-        # Save the document size
-        view_size = self.view.size()
-        # Get selections
-        regions = self.view.sel()
-        num = len(regions)
-        x = len(self.view.substr(regions[0]))
-        # Select the whole document if there is no user selection
-        if num <= 1 and x == 0:
-            regions.clear()
-            regions.add(sublime.Region(0, view_size))
-
-        # For each text selection region
-        for region in regions:
-            data = self.view.substr(region)
-            # Encrypt or decrypt selection
-            try:
-                result = crypt(password, data, enc)
-            except WrongPasswordException:
-                panel(self.view.window(), "Error: Wrong password")
-                result = ''
-            except BadPaddingException:
-                panel(self.view.window(),
-                      "Error: Input is not valid output of AES encryption, "
-                      "sure it's been encrypted?")
-                result = ''
-
-            if result:
-                # Replace selection with encrypted output
-                self.view.replace(edit, region, result)
-        self.view.end_edit(edit)
+        view = self.active_view
+        view.settings().set(TranscryptSaveCommand.ON_SAVE, not self.is_active)
+        # Add status to the status bar, if active
+        view.set_status(TranscryptSaveCommand.ON_SAVE,
+                        self.ACTIVE_STATUS_TEXT if self.is_active else '')
 
 
 def plugin_loaded():

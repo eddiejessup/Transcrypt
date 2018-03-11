@@ -1,6 +1,6 @@
 [
-  {"keys": ["ctrl+k", "e"], "command": "transcrypt_password", "args": {"enc": true}},
-  {"keys": ["ctrl+k", "d"], "command": "transcrypt_password", "args": {"enc": false}},
-  {"keys": ["ctrl+k", "ctrl+e"], "command": "transcrypt_toggle_on_save"},
-  {"keys": ["ctrl+s"], "command": "transcrypt_save"}
+    {"keys": ["ctrl+k", "e"], "command": "encrypt"},
+    {"keys": ["ctrl+k", "d"], "command": "decrypt"},
+    {"keys": ["ctrl+k", "ctrl+e"], "command": "toggle_encrypt_on_save"},
+    {"keys": ["ctrl+s"], "command": "transcrypt_save"}
 ]

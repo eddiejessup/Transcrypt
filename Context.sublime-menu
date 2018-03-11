@@ -1,21 +1,21 @@
-[{
-  "id": "transcryptcontext",
-  "caption": "Transcrypt",
-  "children":[
+[
     {
-        "caption": "Encrypt",
-        "command": "transcrypt_password",
-        "args": {"enc": true}
-    },
-    {
-        "caption": "Decrypt",
-        "command": "transcrypt_password",
-        "args": {"enc": false}
-    },
-    {
-        "caption":"Toggle encrypt on save",
-        "command":"transcrypt_toggle_on_save",
-        "checkbox": true
+        "id": "transcryptcontext",
+        "caption": "Transcrypt",
+        "children": [
+            {
+                "caption": "Encrypt",
+                "command": "encrypt_password"
+            },
+            {
+                "caption": "Decrypt",
+                "command": "decrypt_password"
+            },
+            {
+                "caption": "Toggle encrypt on save",
+                "command": "toggle_encrypt_on_save",
+                "checkbox": true
+            }
+        ]
     }
-  ]
-}]
+]
