@@ -1,9 +1,11 @@
 Transcrypt Sublime Text 3 Package
 =================================
+
 Encrypt and decrypt a document or selection(s) using PyCrypto using AES.
 
 Install
 -------
+
 ### Package Control
 - See [here](http://wbond.net/sublime_packages/package_control) for instructions on installation of Package Control
 - In Sublime Text, search for package 'Transcrypt'
