@@ -259,7 +259,7 @@ class TranscryptSaveCommand(sublime_plugin.TextCommand):
         self.view.end_edit(edit)
 
         if self.is_active:
-            self.view.window().run_command("encrypt_password", {'save': True})
+            self.view.window().run_command("encrypt", {'save': True})
         else:
             self.view.run_command('save')
 

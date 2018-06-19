@@ -5,11 +5,11 @@
         "children": [
             {
                 "caption": "Encrypt",
-                "command": "encrypt_password"
+                "command": "encrypt"
             },
             {
                 "caption": "Decrypt",
-                "command": "decrypt_password"
+                "command": "decrypt"
             },
             {
                 "caption": "Toggle encrypt on save",
