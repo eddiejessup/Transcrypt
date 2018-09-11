@@ -11,6 +11,7 @@ from the context menu and then enter a password
 """
 
 import base64
+import binascii
 import bisect
 import os
 import zipfile
@@ -97,8 +98,8 @@ def decrypt_bytes(secret, s):
     removing padding as needed.
     """
     try:
-        return secret.decrypt(base64.b64decode(s)).rstrip(C_PAD)
-    except ValueError as e:
+        return secret.decrypt(base64.b64decode(s, validate=True)).rstrip(C_PAD)
+    except (ValueError, binascii.Error) as e:
         raise BadPaddingException
 
 
